@@ -11,10 +11,16 @@ from minsearch import Index
 
 load_dotenv()
 
-client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1"
-)
+_client = None
+
+def get_client():
+    global _client
+    if _client is None:
+        _client = OpenAI(
+            api_key=os.getenv("GROQ_API_KEY"),
+            base_url="https://api.groq.com/openai/v1"
+        )
+    return _client
 
 def parse_study(study):
     protocol = study["protocolSection"]
@@ -150,7 +156,7 @@ def rag_agentic(query):
         prompt = build_agentic_prompt(query, results)
         messages = [{"role": "user", "content": prompt}]
 
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model="openai/gpt-oss-120b",
         messages=messages,
         tools=tools,
@@ -168,7 +174,7 @@ def rag_agentic(query):
                 "tool_call_id": call.id,
                 "content": json.dumps(result),
             })
-        final = client.chat.completions.create(
+        final = get_client().chat.completions.create(
             model="openai/gpt-oss-120b",
             messages=messages,
         )
