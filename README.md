@@ -7,14 +7,14 @@ call rather than relying on the LLM to reason about numbers from prose.
 
 ## What it does
 
-- **General questions** ("What trials exist for rheumatoid arthritis?") are
-  answered via retrieval: the system searches a local index of ~200 trials
-  (pulled live from the ClinicalTrials.gov API) and generates an answer
-  grounded in the most relevant matches.
-- **Specific eligibility questions** ("Is a 70-year-old eligible for trial
-  NCT07045896?") are routed to a dedicated tool call that looks up the exact
-  trial and checks the patient's age against its stated min/max age
-  requirements — a deterministic calculation, not a language-model guess.
+* **General questions** ("What trials exist for rheumatoid arthritis?") are
+answered via retrieval: the system searches a local index of \~200 trials
+(pulled live from the ClinicalTrials.gov API) and generates an answer
+grounded in the most relevant matches.
+* **Specific eligibility questions** ("Is a 70-year-old eligible for trial
+NCT07045896?") are routed to a dedicated tool call that looks up the exact
+trial and checks the patient's age against its stated min/max age
+requirements — a deterministic calculation, not a language-model guess.
 
 ## Architecture
 
@@ -23,7 +23,7 @@ User query
     │
     ▼
 Does the query mention a specific NCT ID? ──── yes ──▶ Tool-enabled call
-    │ no                                                (check_eligibility)
+    │ no                                                (check\_eligibility)
     ▼                                                        │
 Retrieve (keyword search over local trial index)              ▼
     │                                                   Deterministic result
@@ -54,11 +54,11 @@ resolves it correctly every time.
 
 ## Tech stack
 
-- **Data source:** [ClinicalTrials.gov API v2](https://clinicaltrials.gov/data-api/api) (free, no auth)
-- **Retrieval:** [`minsearch`](https://github.com/alexeygrigorev/minsearch) — keyword search over trial titles, eligibility text, and conditions
-- **LLM:** `openai/gpt-oss-120b` served via [Groq](https://groq.com) (OpenAI-compatible API)
-- **Tool-calling:** OpenAI-style function calling for deterministic eligibility checks
-- **Environment:** [`uv`](https://github.com/astral-sh/uv) for dependency management
+* **Data source:** [ClinicalTrials.gov API v2](https://clinicaltrials.gov/data-api/api) (free, no auth)
+* **Retrieval:** [`minsearch`](https://github.com/alexeygrigorev/minsearch) — keyword search over trial titles, eligibility text, and conditions
+* **LLM:** `openai/gpt-oss-120b` served via [Groq](https://groq.com) (OpenAI-compatible API)
+* **Tool-calling:** OpenAI-style function calling for deterministic eligibility checks
+* **Environment:** [`uv`](https://github.com/astral-sh/uv) for dependency management
 
 ## Setup
 
@@ -67,24 +67,43 @@ uv sync
 ```
 
 Create a `.env` file with:
+
 ```
-GROQ_API_KEY=your_key_here
+GROQ\_API\_KEY=your\_key\_here
 ```
 
-Run the notebook: `01_first_trial.ipynb`
+Run the notebook: `01\_first\_trial.ipynb`
 
 ## Status
 
-- [x] Core retrieval + generation (RAG)
-- [x] Agentic tool-use layer for deterministic eligibility checks
-- [x] Routing fix for context/tool-use conflict
-- [ ] FastAPI service wrapper
-- [ ] Test suite + CI
-- [ ] Docker containerization
+* \[x] Core retrieval + generation (RAG)
+* \[x] Agentic tool-use layer for deterministic eligibility checks
+* \[x] Routing fix for context/tool-use conflict
+* \[ ] FastAPI service wrapper
+* \[ ] Test suite + CI
+* \[ ] Docker containerization
 
 ## Notes
 
 This project intentionally works with public, aggregate trial metadata only
+
 — no patient records or personal health data are involved anywhere in the
+
 system. "Patient age" is a hypothetical value supplied at query time, used
+
 only to check against a trial's published eligibility criteria.
+
+
+
+Since trial data is pulled live from the ClinicalTrials.gov API rather than
+
+cached, retrieval results can differ across runs — a trial recruiting today
+
+may no longer match the `RECRUITING` status filter days later as its status
+
+changes upstream. This is expected behavior for a system built on a live
+
+data source, not a bug, but worth being aware of when comparing outputs
+
+across sessions.
+
