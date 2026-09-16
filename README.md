@@ -76,12 +76,12 @@ Run the notebook: `01\_first\_trial.ipynb`
 
 ## Status
 
-* \[x] Core retrieval + generation (RAG)
-* \[x] Agentic tool-use layer for deterministic eligibility checks
-* \[x] Routing fix for context/tool-use conflict
-* \[ ] FastAPI service wrapper
-* \[ ] Test suite + CI
-* \[ ] Docker containerization
+- [x] Core retrieval + generation (RAG)
+- [x] Agentic tool-use layer for deterministic eligibility checks
+- [x] Routing fix for context/tool-use conflict
+- [x] FastAPI service wrapper
+- [x] Test suite + CI
+- [x] Docker containerization
 
 ## Notes
 
