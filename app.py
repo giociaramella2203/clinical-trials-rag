@@ -95,8 +95,7 @@ def fetch_trials(condition, page_size=100):
 all_trials = []
 trial_embeddings = None
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+def load_data():
     global all_trials, trial_embeddings
 
     conditions = [
@@ -119,10 +118,12 @@ async def lifespan(app: FastAPI):
 
     trial_embeddings = load_or_compute_embeddings(all_trials)
 
-    print(f"Loaded {len(all_trials)} trials at startup.")
+    print(f"Loaded {len(all_trials)} trials.")
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    load_data()
     yield
-
     print("Shutting down.")
 
 app = FastAPI(title="Clinical Trials Eligibility Assistant", lifespan=lifespan)
