@@ -7,6 +7,12 @@ call rather than relying on the LLM to reason about numbers from prose.
 Includes a FastAPI service layer, a Streamlit chat interface, a test suite
 with CI, and a Dockerfile for containerized deployment.
 
+## 🔗 Live demo
+
+Try it here — no setup required: **[clinical-trials-rag on Streamlit](https://giociaramella2203-clinical-trials-rag-streamlit-app-3lb3dz.streamlit.app/)**
+
+(Note: the first question after a period of inactivity may take a little longer, as the app spins back up and loads trial data.)
+
 ## What it does
 
 - **General questions** ("What trials exist for rheumatoid arthritis?") are
