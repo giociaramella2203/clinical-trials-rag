@@ -98,6 +98,9 @@ trial_embeddings = None
 def load_data():
     global all_trials, trial_embeddings
 
+    if all_trials:
+        return
+
     conditions = [
         "rheumatoid arthritis",
         "breast cancer",
