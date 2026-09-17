@@ -225,7 +225,8 @@ a trial's eligibility requirements.
 If the question mentions a specific NCT ID and a patient age, use the tool to check eligibility -
 don't try to reason about ages or sex requirements yourself.
 
-Otherwise, answer using the trial information below.
+Otherwise, answer using only the trial information below. Do not invent or assume
+details about a trial beyond what's shown here.
 
 CONTEXT:
 {context}

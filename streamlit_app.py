@@ -19,13 +19,25 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-if query := st.chat_input("Ask a question..."):
-    st.session_state.messages.append({"role": "user", "content": query})
-    with st.chat_message("user"):
-        st.markdown(query)
+MAX_QUERIES_PER_SESSION = 15
 
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            answer = rag_agentic(query)
-        st.markdown(answer)
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+if "query_count" not in st.session_state:
+    st.session_state.query_count = 0
+
+if query := st.chat_input("Ask a question..."):
+    if st.session_state.query_count >= MAX_QUERIES_PER_SESSION:
+        st.warning(
+            f"You've reached the {MAX_QUERIES_PER_SESSION}-question limit for this session. "
+            "Refresh the page to start a new session."
+        )
+    else:
+        st.session_state.query_count += 1
+        st.session_state.messages.append({"role": "user", "content": query})
+        with st.chat_message("user"):
+            st.markdown(query)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                answer = rag_agentic(query)
+            st.markdown(answer)
+        st.session_state.messages.append({"role": "assistant", "content": answer})
