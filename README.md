@@ -72,6 +72,31 @@ instruction "win" through stronger prompt wording — a more robust fix,
 since it eliminates the ambiguity at the source instead of hoping the model
 resolves it correctly every time.
 
+## A hallucination bug found via manual testing
+
+The NCT-ID routing branch originally sent the model only the numeric
+eligibility data returned by `check_eligibility` (age range, sex
+requirement) — not the trial's actual title or condition. When asked to
+describe a trial by ID, the model had no real information to draw on for
+*what the trial studies*, and in one observed case fabricated a
+plausible-sounding but entirely wrong description (inventing a multiple
+myeloma antibody trial for what was actually a lung cancer pulmonary
+rehabilitation study) — while still computing the age-eligibility answer
+correctly, since that part *was* grounded in real data.
+
+**Fix:** `check_eligibility` now also returns the trial's real title and
+conditions, and the NCT-ID branch includes an explicit instruction not to
+describe the trial beyond what the tool provides. This closes the gap
+between "the eligibility math is correct" and "the surrounding description
+is trustworthy" — both now draw on the same real data.
+
+This was caught through manual testing, not the automated eval suite —
+worth noting as a real limitation: `eval.py`'s eligibility checks verify
+the *eligible/not-eligible* judgment but don't check whether the trial
+description in the answer is factually accurate. A stronger eval would
+also assert on the returned trial name/condition, not just the boolean
+outcome.
+
 ## Tech stack
 
 - **Data source:** [ClinicalTrials.gov API v2](https://clinicaltrials.gov/data-api/api) (free, no auth)
