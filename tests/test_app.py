@@ -38,7 +38,25 @@ def test_check_eligibility_no_max_age():
     app_module.all_trials = [
         {"nct_id": "NCT00000001", "min_age": "18 Years", "max_age": None}
     ]
-    
+
     result = check_eligibility("NCT00000001", 90)
-    
+
     assert result["eligible_by_age"] == True
+
+def test_check_eligibility_sex_mismatch():
+    app_module.all_trials = [
+        {"nct_id": "NCT00000001", "min_age": "18 Years", "max_age": "65 Years", "sex": "FEMALE"}
+    ]
+
+    result = check_eligibility("NCT00000001", 30, patient_sex="MALE")
+
+    assert result["eligible_by_sex"] == False
+
+def test_check_eligibility_sex_all_accepts_anyone():
+    app_module.all_trials = [
+        {"nct_id": "NCT00000001", "min_age": "18 Years", "max_age": "65 Years", "sex": "ALL"}
+    ]
+
+    result = check_eligibility("NCT00000001", 30, patient_sex="MALE")
+
+    assert result["eligible_by_sex"] == True

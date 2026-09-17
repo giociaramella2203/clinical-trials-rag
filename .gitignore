@@ -6,5 +6,6 @@ wheels/
 *.egg-info 
 .venv 
 .env 
-.ipynb_checkpoints/ 
-desktop.ini 
+.ipynb_checkpoints/
+desktop.ini
+trial_embeddings_cache.npz 
