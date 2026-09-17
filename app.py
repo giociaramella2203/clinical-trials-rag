@@ -180,6 +180,8 @@ def check_eligibility(nct_id, patient_age, patient_sex=None):
 
     return {
         "nct_id": nct_id,
+        "trial_title": trial["title"],
+        "trial_conditions": trial["conditions"],
         "eligible_by_age": eligible_by_age,
         "eligible_by_sex": eligible_by_sex,
         "min_age": min_age,
@@ -237,7 +239,13 @@ def rag_agentic(query):
     retrieved_nct_ids = []
 
     if nct_match:
-        messages = [{"role": "user", "content": query}]
+        instructed_query = (
+            f"{query}\n\n"
+            "Use the check_eligibility tool to answer. Only describe the trial using "
+            "information returned by the tool - do not invent or assume details about "
+            "what the trial studies beyond what the tool provides."
+        )
+        messages = [{"role": "user", "content": instructed_query}]
     else:
         results = search_trials(query, num_results=5)
         retrieved_nct_ids = [r["nct_id"] for r in results]
