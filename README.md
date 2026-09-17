@@ -1,11 +1,12 @@
 # Clinical Trials Eligibility Assistant
 
-An agentic RAG system that answers questions about clinical trials using live
-data from [ClinicalTrials.gov](https://clinicaltrials.gov), and can precisely
-check age-based eligibility for a specific trial using a deterministic tool
-call rather than relying on the LLM to reason about numbers from prose.
-Includes a FastAPI service layer, a Streamlit chat interface, a test suite
-with CI, and a Dockerfile for containerized deployment.
+An agentic RAG system that answers questions across ~800 clinical trials
+spanning 8 conditions, using local semantic search (sentence-transformers
+embeddings) over live data from [ClinicalTrials.gov](https://clinicaltrials.gov).
+Precisely checks age- and sex-based eligibility for a specific trial using a
+deterministic tool call rather than relying on the LLM to reason from prose.
+Includes a FastAPI service layer, a Streamlit chat interface, an evaluation
+harness, query logging, a test suite with CI, and Docker/cloud deployment.
 
 ## 🔗 Live demo
 
