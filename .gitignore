@@ -10,3 +10,4 @@ wheels/
 desktop.ini
 trial_embeddings_cache.npz 
 readme_diff.txt 
+query_log.jsonl 

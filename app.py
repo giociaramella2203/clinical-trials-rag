@@ -8,6 +8,8 @@ import json
 import hashlib
 import requests
 import numpy as np
+import logging
+from datetime import datetime, timezone
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
 
@@ -25,6 +27,19 @@ def get_embedding_model():
     if _embedding_model is None:
         _embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
     return _embedding_model
+
+LOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "query_log.jsonl")
+
+def log_interaction(query, retrieved_nct_ids, tool_called, answer):
+    entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "query": query,
+        "retrieved_nct_ids": retrieved_nct_ids,
+        "tool_called": tool_called,
+        "answer": answer,
+    }
+    with open(LOG_PATH, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry) + "\n")
 
 def trial_text(trial):
     return f"{trial['title']} {trial['eligibility_criteria']} {trial['conditions']}"
@@ -219,11 +234,13 @@ ANSWER:"""
 
 def rag_agentic(query):
     nct_match = re.search(r"NCT\d{8}", query)
+    retrieved_nct_ids = []
 
     if nct_match:
         messages = [{"role": "user", "content": query}]
     else:
         results = search_trials(query, num_results=5)
+        retrieved_nct_ids = [r["nct_id"] for r in results]
         prompt = build_agentic_prompt(query, results)
         messages = [{"role": "user", "content": prompt}]
 
@@ -249,9 +266,13 @@ def rag_agentic(query):
             model="openai/gpt-oss-120b",
             messages=messages,
         )
-        return final.choices[0].message.content
+        answer = final.choices[0].message.content
+        log_interaction(query, retrieved_nct_ids, True, answer)
+        return answer
 
-    return msg.content
+    answer = msg.content
+    log_interaction(query, retrieved_nct_ids, False, answer)
+    return answer
 
 class Question(BaseModel):
     query: str
