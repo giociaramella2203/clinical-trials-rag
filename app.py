@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
+import threading
 import os
 import re
 import json
@@ -110,11 +111,14 @@ def fetch_trials(condition, page_size=100):
 all_trials = []
 trial_embeddings = None
 
+_load_lock = threading.Lock()
+
 def load_data():
     global all_trials, trial_embeddings
 
-    if all_trials:
-        return
+    with _load_lock:
+        if all_trials:
+            return
 
     conditions = [
         "rheumatoid arthritis",
